@@ -2,7 +2,7 @@ export const cors = (req, res, next) => {
   const origin = req.headers.origin || req.headers.host
   const allowedOrigins = new Set([
     'http://127.0.0.1:5500',
-    'https://funval-users-fe.onrender.com/'
+    'https://funval-users-fe.onrender.com'
   ])
   console.log('Origin:', origin)
   console.log('Complete url:', req.originalUrl)
