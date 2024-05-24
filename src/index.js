@@ -19,13 +19,13 @@ app.options('*', corsOptions)
 app.get('/is-alive', (req, res) => res.send({ success: true }))
 
 // testers
-app.use('/testers/', testerRoutes)
+app.use('/testers', testerRoutes)
 
 // users
-app.use('/users/', userRoutes)
+app.use('/users', userRoutes)
 
 // user seeders
-app.use('/user-seeder/', userSeederRoutes)
+app.use('/users-seeder', userSeederRoutes)
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Ruta no encontrada' })

@@ -38,6 +38,8 @@ export const addTester = async (req, res) => {
 const validateTesterLocal = async (tester, errorList) => {
   if (!tester.username) errorList.push('Falta el nombre de usuario')
   if (!tester.password) errorList.push('Falta la contraseña')
+  if (!tester.table) errorList.push('Falta el nombre de la table')
+  else tester.table = 'user' + tester.table
 }
 
 export const validateTesterDB = async (tester, errorList) => {

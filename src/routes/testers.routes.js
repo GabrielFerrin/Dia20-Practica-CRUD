@@ -9,14 +9,14 @@ import {
 
 const router = Router()
 
-router.get('login', testerLogin)
+router.get('/login', testerLogin)
 router.get('', getTesters)
-router.get('check', checkAvailableTester)
-router.get('available/:username', availableTesterUsername)
-router.post('register', addTester)
+router.get('/check', checkAvailableTester)
+router.get('/available/:username', availableTesterUsername)
+router.post('/register', addTester)
 // testers seeders
-router.post('create-table', createTesterTable)
-router.delete('drop-tester-table', dropTesterTable)
-router.delete('truncate-tester-table', trucateTesterTable)
+router.post('/create-table', createTesterTable)
+router.delete('/drop-tester-table', dropTesterTable)
+router.delete('/truncate-tester-table', trucateTesterTable)
 
 export default router

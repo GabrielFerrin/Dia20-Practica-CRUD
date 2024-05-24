@@ -6,9 +6,9 @@ import {
 
 const router = Router()
 
-router.post('/users/create-user-table/', createUserTable)
-router.delete('/seeder/drop-user-table', dropUserTable)
-router.delete('/seeder/truncate-user-table', trucateUserTable)
-router.post('/users/seed-users', seedUsers)
+router.post('/create-user-table/', createUserTable)
+router.delete('/drop-user-table', dropUserTable)
+router.delete('/truncate-user-table', trucateUserTable)
+router.post('/seed-users', seedUsers)
 
 export default router
