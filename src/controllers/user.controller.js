@@ -58,13 +58,26 @@ export const updateUser = async (req, res) => {
 }
 
 export const deleteUser = async (req, res) => {
+  console.log(req.query)
+  const { user, pass, id } = req.query
+  if (!pass || !user || !id) {
+    const message = 'Faltan datos'
+    return res.send({ success: false, message })
+  }
   try {
-    const sql = 'DELETE FROM `user` WHERE `id` = ?'
-    const [rows] = await pool.execute(sql, [req.params.id])
+    // obtener nombre de la table del tester
+    let sql = 'SELECT * FROM `tester` WHERE `username` = ? AND `password` = ?'
+    const [tableRes] = await pool.execute(sql, [user, pass])
+    if (tableRes.length === 0) {
+      const message = 'Usuario o contraseña incorrecta'
+      return res.status(404).json({ success: false, message })
+    }
+    sql = 'DELETE FROM `' + tableRes[0].table + '` WHERE `user_id` = ?'
+    const [rows] = await pool.execute(sql, [id])
     if (rows.affectedRows === 0) {
       return res.status(404).json({ message: 'Usuario no existe' })
     }
-    res.send(rows)
+    res.send({ success: true, message: 'Usuario eliminado' })
   } catch (error) {
     res.status(500).send(error)
   }
