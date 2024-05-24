@@ -1,25 +1,33 @@
 import pool from '../db/db.js'
 
 export const createUserTable = async (req, res) => {
+  const { table } = req.body
+  if (!table) {
+    return res.send({ ok: false, message: 'No se recibió la tabla' })
+  }
   try {
-    const sql = 'CREATE TABLE IF NOT EXISTS `users` (' +
-      '`id` INT NOT NULL AUTO_INCREMENT,' +
-      '`name` VARCHAR(255) NOT NULL,' +
+    const sql = 'CREATE TABLE IF NOT EXISTS `user' + table + '` (' +
+      '`user_id` INT NOT NULL AUTO_INCREMENT,' +
+      '`name` VARCHAR(255) NOT NULL UNIQUE,' +
       '`email` VARCHAR(255) NOT NULL UNIQUE,' +
       '`role` VARCHAR(255) NOT NULL,' +
-      '`picture` VARCHAR(255),' +
-      'PRIMARY KEY (`id`)' +
+      '`picture` TEXT,' +
+      'PRIMARY KEY (`user_id`)' +
       ');'
     const [rows] = await pool.execute(sql)
-    res.send(rows)
+    res.json({ success: true, rows })
   } catch (error) {
     res.status(500).send(error)
   }
 }
 
 export const dropUserTable = async (req, res) => {
+  const { table } = req.body
+  if (!table) {
+    return res.send({ ok: false, message: 'No se recibió la tabla' })
+  }
   try {
-    const sql = 'DROP TABLE IF EXISTS users;'
+    const sql = 'DROP TABLE IF EXISTS `' + table + '`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {
@@ -29,7 +37,7 @@ export const dropUserTable = async (req, res) => {
 
 export const trucateUserTable = async (req, res) => {
   try {
-    const sql = 'TRUNCATE TABLE `users`;'
+    const sql = 'TRUNCATE TABLE `user`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {
@@ -38,8 +46,12 @@ export const trucateUserTable = async (req, res) => {
 }
 
 export const seedUsers = async (req, res) => {
+  const { table } = req.body
+  if (!table) {
+    return res.send({ ok: false, message: 'No se recibió la tabla' })
+  }
   try {
-    const sql = 'INSERT IGNORE INTO `users` (`name`, `email`, `role`, `picture`)' +
+    const sql = 'INSERT IGNORE INTO `user' + table + '` (`name`, `email`, `role`, `picture`)' +
     'VALUES ' +
     "('John Doe', 'john.doe@example.com', 'Maestro', 'https://example.com/john.jpg')," +
     "('Jane Smith', 'jane.smith@example.com', 'Controller', 'https://example.com/jane.jpg')," +
@@ -52,7 +64,7 @@ export const seedUsers = async (req, res) => {
     "('Michael Smith', 'michael.smith@example.com', 'Maestro', 'https://example.com/michael.jpg')," +
     "('Emma Johnson', 'emma.johnson@example.com', 'Controller', 'https://example.com/emma.jpg')"
     const [rows] = await pool.execute(sql, [req.body])
-    res.send(rows)
+    res.json({ success: true, rows })
   } catch (error) {
     res.status(500).send(error)
   }
