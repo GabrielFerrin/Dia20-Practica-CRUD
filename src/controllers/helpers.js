@@ -2,9 +2,10 @@ export const cors = (req, res, next) => {
   const origin = req.headers.origin || req.headers.host
   const allowedOrigins = new Set([
     'http://127.0.0.1:5500',
-    'http://localhost:3001',
     'https://funval-users-fe.onrender.com/'
   ])
+  console.log('Origin:', origin)
+  console.log('Complete url:', req.originalUrl)
   const isAllowed = allowedOrigins.has(origin)
   res.setHeader('Access-Control-Allow-Origin', isAllowed ? origin : '')
   res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
