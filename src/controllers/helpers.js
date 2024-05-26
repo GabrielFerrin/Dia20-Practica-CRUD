@@ -78,9 +78,14 @@ const getFolderSize = async (folderPath) => {
 }
 
 export const checkStorage = async (req, res) => {
-  const folderSize = await getFolderSize('./pictures')
-  console.log(`The size of the folder is ${folderSize} bytes.`)
-  res.send({ folderSize: parseFloat(folderSize) })
+  try {
+    const folderSize = await getFolderSize('./pictures')
+    console.log(`The size of the folder is ${folderSize} bytes.`)
+    res.send({ folderSize: parseFloat(folderSize) })
+  } catch (error) {
+    if (error.code === 'ENOENT') res.send({ folderSize: 0 })
+    res.status(500).json(error)
+  }
 }
 
 export const eliminateStorage = async (req, res) => {

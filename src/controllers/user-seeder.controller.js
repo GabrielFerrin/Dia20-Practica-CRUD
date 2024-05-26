@@ -28,7 +28,7 @@ export const dropUserTable = async (req, res) => {
     return res.send({ ok: false, message: 'No se recibió la tabla' })
   }
   try {
-    const sql = 'TRUNCATE TABLE`' + table + '`;'
+    const sql = 'DROP TABLE`' + table + '`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {
