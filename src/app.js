@@ -17,7 +17,7 @@ app.options('*', corsOptions)
 // is alive
 app.get('/is-alive', (req, res) => res.send({ success: true }))
 // chek storage
-app.get('/check-storage', checkStorage)
+app.get('/check-storage-size', checkStorage)
 app.delete('/eliminate-sotrage', eliminateStorage)
 
 // testers

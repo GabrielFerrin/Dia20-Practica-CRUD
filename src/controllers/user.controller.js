@@ -1,5 +1,6 @@
 import pool from '../db/db.js'
 import path from 'path'
+import { checkStorage, checkStorageLocal } from './helpers.js'
 
 export const getUsers = async (req, res) => {
   const { user, pass } = req.query
@@ -69,20 +70,22 @@ const validateUser = async (user, pass, body, errorList) => {
 }
 
 export const createUser = async (req, res) => {
-  // validate query
-  const { user, pass } = req.query
-  if (!pass || !user) {
-    const message = 'No se recibieron los datos del tester'
-    return res.send({ success: false, message })
-  }
-  // validate body
-  const errorList = []
-  const table = await validateUser(user, pass, req.body, errorList)
-  if (errorList.length) {
-    return res.status(400).send({ success: false, message: errorList })
-  }
-  // add user
   try {
+    const errorList = []
+    // check storage
+    await checkStorageLocal(errorList)
+    // validate query
+    const { user, pass } = req.query
+    const message = 'No se recibieron los datos del tester'
+    if (!pass || !user) {
+      return res.send({ success: false, message })
+    }
+    // validate body
+    const table = await validateUser(user, pass, req.body, errorList)
+    if (errorList.length) {
+      return res.status(400).send({ success: false, message: errorList })
+    }
+    // add user
     const sql = 'INSERT INTO `' + table + '` SET ?'
     const [rows] = await pool.query(sql, [req.body])
     res.json({ success: true, rows })

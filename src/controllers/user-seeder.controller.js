@@ -28,7 +28,7 @@ export const dropUserTable = async (req, res) => {
     return res.send({ ok: false, message: 'No se recibió la tabla' })
   }
   try {
-    const sql = 'DROP TABLE`' + table + '`;'
+    const sql = 'DROP TABLE IF EXISTS `' + table + '`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {
@@ -54,16 +54,16 @@ export const seedUsers = async (req, res) => {
   try {
     const sql = 'INSERT IGNORE INTO `user' + table + '` (`name`, `email`, `role`, `picture`)' +
     'VALUES ' +
-    "('John Doe', 'john.doe@example.com', 'Maestro', 'https://example.com/john.jpg')," +
-    "('Jane Smith', 'jane.smith@example.com', 'Controller', 'https://example.com/jane.jpg')," +
-    "('Bob Johnson', 'bob.johnson@example.com', 'Controller', 'https://example.com/bob.jpg')," +
-    "('Alice Brown', 'alice.brown@example.com', 'Maestro', 'https://example.com/alice.jpg')," +
-    "('David Wilson', 'david.wilson@example.com', 'Supervisor', 'https://example.com/david.jpg')," +
-    "('Emily Davis', 'emily.davis@example.com', 'Controller', 'https://example.com/emily.jpg')," +
-    "('Mike Thompson', 'mike.thompson@example.com', 'Maestro', 'https://example.com/mike.jpg')," +
-    "('Sarah Garcia', 'sarah.garcia@example.com', 'Supervisor', 'https://example.com/sarah.jpg')," +
-    "('Michael Smith', 'michael.smith@example.com', 'Maestro', 'https://example.com/michael.jpg')," +
-    "('Emma Johnson', 'emma.johnson@example.com', 'Controller', 'https://example.com/emma.jpg')"
+    "('John Doe', 'john.doe@example.com', 'Maestro', 'local')," +
+    "('Jane Smith', 'jane.smith@example.com', 'Controller', 'local')," +
+    "('Bob Johnson', 'bob.johnson@example.com', 'Controller', 'local')," +
+    "('Alice Brown', 'alice.brown@example.com', 'Maestro', 'local')," +
+    "('David Wilson', 'david.wilson@example.com', 'Supervisor', 'local')," +
+    "('Emily Davis', 'emily.davis@example.com', 'Controller', 'local')," +
+    "('Mike Thompson', 'mike.thompson@example.com', 'Maestro', 'local')," +
+    "('Sarah Garcia', 'sarah.garcia@example.com', 'Supervisor', 'local')," +
+    "('Michael Smith', 'michael.smith@example.com', 'Maestro', 'local')," +
+    "('Emma Johnson', 'emma.johnson@example.com', 'Controller', 'local')"
     const [rows] = await pool.execute(sql, [req.body])
     res.json({ success: true, rows })
   } catch (error) {

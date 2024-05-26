@@ -80,11 +80,21 @@ const getFolderSize = async (folderPath) => {
 export const checkStorage = async (req, res) => {
   try {
     const folderSize = await getFolderSize('./pictures')
-    console.log(`The size of the folder is ${folderSize} bytes.`)
-    res.send({ folderSize: parseFloat(folderSize) })
+    res.send({ success: true, folderSize: parseFloat(folderSize) })
   } catch (error) {
-    if (error.code === 'ENOENT') res.send({ folderSize: 0 })
-    res.status(500).json(error)
+    if (error.code === 'ENOENT') res.send({ success: true, folderSize: 0 })
+    else res.status(500).json(error)
+  }
+}
+
+export const checkStorageLocal = async (errorList) => {
+  let message = 'No queda espacio en el servidor. Esperamos resolverlo pronto.'
+  try {
+    const folderSize = await getFolderSize('./pictures')
+    if (folderSize >= 9500) errorList.push(message)
+  } catch (error) {
+    message = 'Error al comprobar espacio disponible en el servidor (file manager)'
+    errorList(message)
   }
 }
 

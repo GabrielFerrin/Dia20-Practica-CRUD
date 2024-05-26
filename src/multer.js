@@ -21,11 +21,11 @@ const imageStorage = multer.diskStorage({
 })
 
 const imageLimits = {
-  fileSize: 1024 * 1024 * 5, files: 1
+  // límite 4MB
+  fileSize: 1024 * 1024 * 4, files: 1
 }
 
 const imageFilter = (req, file, cb) => {
-  console.log('From middleware:', file.mimetype)
   if (file.mimetype.includes('image')) {
     cb(null, true)
   } else {
@@ -38,3 +38,16 @@ export const imageUpload = multer({
   limits: imageLimits,
   fileFilter: imageFilter
 })
+
+export const multerError = (err, req, res, next) => {
+  if (err) {
+    let message = 'La foto supera el límite de 4MB'
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      console.log('Multer error:', err.code)
+      return res.status(400).send({ success: false, message })
+    } else {
+      message = 'Error al subir la imagen (file manager)'
+      return res.status(500).send({ success: false, message })
+    }
+  }
+}
