@@ -8,10 +8,11 @@ export const createUserTable = async (req, res) => {
   try {
     const sql = 'CREATE TABLE IF NOT EXISTS `user' + table + '` (' +
       '`user_id` INT NOT NULL AUTO_INCREMENT,' +
-      '`name` VARCHAR(255) NOT NULL UNIQUE,' +
+      '`name` VARCHAR(255) NOT NULL,' +
       '`email` VARCHAR(255) NOT NULL UNIQUE,' +
+      '`password` VARCHAR(255) NOT NULL,' +
       '`role` VARCHAR(255) NOT NULL,' +
-      '`picture` TEXT,' +
+      '`picture` VARCHAR(255),' +
       'PRIMARY KEY (`user_id`)' +
       ');'
     const [rows] = await pool.execute(sql)
@@ -27,7 +28,7 @@ export const dropUserTable = async (req, res) => {
     return res.send({ ok: false, message: 'No se recibió la tabla' })
   }
   try {
-    const sql = 'DROP TABLE IF EXISTS `' + table + '`;'
+    const sql = 'TRUNCATE TABLE`' + table + '`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {

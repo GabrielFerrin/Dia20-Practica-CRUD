@@ -54,15 +54,16 @@ export const validateTesterDB = async (tester, errorList) => {
 }
 
 export const availableTesterUsername = async (req, res) => {
-  console.log(req.params)
   try {
     const sql = 'SELECT * FROM `tester` WHERE `username` = ?'
     const [rows] = await pool.execute(sql, [req.params.username])
-    const message = 'El nombre de usuario no está disponible'
-    if (rows.length > 0) res.status(400).json({ success: false, message })
-    else res.send({ success: true })
+    if (rows.length > 0) {
+      const message = 'El nombre de usuario no está disponible'
+      return res.status(400).json({ success: false, message })
+    }
+    return res.send({ success: true })
   } catch (error) {
-    res.status(500).send(error)
+    return res.status(500).send(error)
   }
 }
 

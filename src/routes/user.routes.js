@@ -1,14 +1,17 @@
 import { Router } from 'express'
 import {
   getUserById, getUsers, createUser,
-  updateUser, deleteUser
+  updateUser, deleteUser,
+  checkEmailAvailable
 } from '../controllers/user.controller.js'
+import { imageUpload } from '../multer.js'
 
 const router = Router()
 
 router.get('/', getUsers)
+router.get('/check-email/', checkEmailAvailable)
 router.get('/:id', getUserById)
-router.post('/', createUser)
+router.post('/', imageUpload.single('picture'), createUser)
 router.patch('/:id', updateUser)
 router.delete('/', deleteUser)
 
