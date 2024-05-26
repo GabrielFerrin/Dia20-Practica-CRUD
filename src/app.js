@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 // local imports
-import { cors, corsOptions } from './controllers/helpers.js'
+import { checkStorage, cors, corsOptions, eliminateStorage } from './controllers/helpers.js'
 // routes
 import userRoutes from './routes/user.routes.js'
 import testerRoutes from './routes/testers.routes.js'
@@ -16,23 +16,21 @@ app.options('*', corsOptions)
 
 // is alive
 app.get('/is-alive', (req, res) => res.send({ success: true }))
+// chek storage
+app.get('/check-storage', checkStorage)
+app.delete('/eliminate-sotrage', eliminateStorage)
 
 // testers
 app.use('/testers', testerRoutes)
-
 // users
 app.use('/users', userRoutes)
-
 // user seeders
 app.use('/users-seeder', userSeederRoutes)
-
 app.use((req, res) => {
   res.status(404).send({ message: 'Ruta no encontrada' })
 })
-
 app.use((err, req, res, next) => {
-  console.log(err)
-  res.status(500).send({ message: 'Algo salio mal' })
+  console.log(err.stack)
+  res.status(500).send({ success: false, message: err.message })
 })
-
 export default app

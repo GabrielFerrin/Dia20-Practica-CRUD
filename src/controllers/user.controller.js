@@ -1,4 +1,5 @@
 import pool from '../db/db.js'
+import path from 'path'
 
 export const getUsers = async (req, res) => {
   const { user, pass } = req.query
@@ -148,6 +149,32 @@ export const checkEmailAvailable = async (req, res) => {
       return res.status(400).json({ success: false, message })
     }
     return res.send({ success: true })
+  } catch (error) {
+    return res.status(500).send(error)
+  }
+}
+
+export const getPicture = async (req, res) => {
+  const { user, pass, id } = req.query
+  if (!pass || !user || !id) {
+    const message = 'Faltan datos'
+    return res.send({ success: false, message })
+  }
+  try {
+    const query = 'SELECT * FROM `tester` WHERE `username` = ? AND `password` = ?'
+    const [tableRes] = await pool.execute(query, [user, pass])
+    if (tableRes.length === 0) {
+      const message = 'Usuario o contraseña incorrecta'
+      return res.status(404).json({ success: false, message })
+    }
+    const sql = 'SELECT `picture` FROM `' + tableRes[0].table + '` WHERE `user_id` = ?'
+    const [filenameRes] = await pool.execute(sql, [id])
+    if (filenameRes.length === 0) {
+      return res.status(404).json({ message: 'Usuario no existe' })
+    }
+    const filePath = path.resolve(`./pictures/${tableRes[0].table}/${filenameRes[0].picture}`)
+    console.log('PATH: ', filePath)
+    res.sendFile(filePath)
   } catch (error) {
     return res.status(500).send(error)
   }

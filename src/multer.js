@@ -1,12 +1,22 @@
 import multer from 'multer'
+import path from 'path'
+import { verifyFolders } from './controllers/helpers.js'
 // import pool from './db/db.js'
 
 const imageStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'pictures/')
+  destination: async (req, file, cb) => {
+    const { user, pass } = req.query
+    if (!user || !pass) {
+      cb(new Error('No se recibieron los datos del tester'))
+    }
+    const res = await verifyFolders(user, pass)
+    if (res.errorCode) return cb(new Error(res.message))
+    cb(null, 'pictures/' + res.table)
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname)
+    const fileName = Date.now() + path.extname(file.originalname)
+    req.body.picture = fileName
+    cb(null, fileName)
   }
 })
 
@@ -16,7 +26,7 @@ const imageLimits = {
 
 const imageFilter = (req, file, cb) => {
   console.log('From middleware:', file.mimetype)
-  if (file.mimetype.contains('image')) {
+  if (file.mimetype.includes('image')) {
     cb(null, true)
   } else {
     cb(null, false)

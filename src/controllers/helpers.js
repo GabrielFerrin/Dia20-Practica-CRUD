@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import pool from '../db/db.js'
+import path from 'path'
 
 export const cors = (req, res, next) => {
   const origin = req.headers.origin || req.headers.host
@@ -58,5 +59,38 @@ export const verifyFolders = async (user, pass) => {
         return { ok: false, errorCode: 3, message: error }
       }
     }
+  }
+}
+
+const getFolderSize = async (folderPath) => {
+  const files = await fs.readdir(folderPath)
+  let size = 0
+  for (const file of files) {
+    const filePath = path.join(folderPath, file)
+    const stats = await fs.stat(filePath)
+    if (stats.isDirectory()) {
+      size += await getFolderSize(filePath)
+    } else {
+      size += stats.size
+    }
+  }
+  return (size / (1024)).toFixed(4)
+}
+
+export const checkStorage = async (req, res) => {
+  const folderSize = await getFolderSize('./pictures')
+  console.log(`The size of the folder is ${folderSize} bytes.`)
+  res.send({ folderSize: parseFloat(folderSize) })
+}
+
+export const eliminateStorage = async (req, res) => {
+  try {
+    const filePath = path.resolve('./pictures')
+    await fs.access(filePath)
+    await fs.rm(filePath, { recursive: true, force: true })
+    res.json({ success: true })
+  } catch (error) {
+    if (error.code === 'ENOENT') res.json({ success: true })
+    else res.status(500).json(error)
   }
 }
