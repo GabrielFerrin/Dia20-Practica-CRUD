@@ -13,8 +13,8 @@ router.get('/', getUsers)
 router.get('/check-email/', checkEmailAvailable)
 router.get('/picture/', getPicture)
 router.get('/:id', getUserById)
+router.patch('/', imageUpload.single('picture'), multerError, updateUser)
 router.post('/', imageUpload.single('picture'), multerError, createUser)
-router.patch('/:id', updateUser)
 router.delete('/', deleteUser)
 
 export default router

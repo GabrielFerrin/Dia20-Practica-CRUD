@@ -11,6 +11,7 @@ import userSeederRoutes from './routes/user-seeder.routes.js'
 const app = express()
 app.use(morgan('dev'))
 app.use(express.json())
+// cors
 app.use(cors)
 app.options('*', corsOptions)
 
@@ -26,11 +27,14 @@ app.use('/testers', testerRoutes)
 app.use('/users', userRoutes)
 // user seeders
 app.use('/users-seeder', userSeederRoutes)
+// 404
 app.use((req, res) => {
   res.status(404).send({ message: 'Ruta no encontrada' })
 })
+// hanle unhandled errors
 app.use((err, req, res, next) => {
   console.log(err.stack)
   res.status(500).send({ success: false, message: err.message })
 })
+// export
 export default app

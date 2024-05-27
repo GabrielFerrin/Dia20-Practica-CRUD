@@ -4,14 +4,16 @@ import path from 'path'
 
 export const cors = (req, res, next) => {
   const origin = req.headers.origin || req.headers.host
+  console.log('Complete url:', origin + req.originalUrl)
   const allowedOrigins = new Set([
     'http://127.0.0.1:5500',
+    'http://127.0.0.1:3000',
     'https://funval-users-fe.onrender.com'
   ])
   // console.log('Complete url:', origin + req.originalUrl)
   const isAllowed = allowedOrigins.has(origin)
   res.setHeader('Access-Control-Allow-Origin', isAllowed ? origin : '')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   next()
 }
@@ -20,16 +22,17 @@ export const corsOptions = (req, res) => {
   const origin = req.headers.origin || req.headers.host
   const allowedOrigins = new Set([
     'http://127.0.0.1:5500',
+    'http://127.0.0.1:3000',
     'https://funval-users-fe.onrender.com'
   ])
   const isAllowed = allowedOrigins.has(origin)
   res.setHeader('Access-Control-Allow-Origin', isAllowed ? origin : '')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   res.status(204).end()
 }
 
-export const verifyFolders = async (user, pass) => {
+export const verifyFolders = async (user = '', pass = '') => {
   // 0: Todo correcto
   // 1: No se pudo crear pictures
   // 2: Usuario o contraseña incorrecta
@@ -42,6 +45,7 @@ export const verifyFolders = async (user, pass) => {
       return { ok: false, errorCode: 1, message: error }
     }
   }
+  if (user === '' && pass === '') return 0
   const query = 'SELECT * FROM `tester` WHERE `username` = ? AND `password` = ?'
   const [rows] = await pool.execute(query, [user, pass])
   const message = { ok: false, errorCode: 2, message: 'Usuario o contraseña incorrecta' }
@@ -63,18 +67,25 @@ export const verifyFolders = async (user, pass) => {
 }
 
 const getFolderSize = async (folderPath) => {
-  const files = await fs.readdir(folderPath)
-  let size = 0
-  for (const file of files) {
-    const filePath = path.join(folderPath, file)
-    const stats = await fs.stat(filePath)
-    if (stats.isDirectory()) {
-      size += await getFolderSize(filePath)
-    } else {
-      size += stats.size
+  try {
+    if (!await verifyFolders()) {
+      const files = await fs.readdir(folderPath)
+      let size = 0
+      for (const file of files) {
+        const filePath = path.join(folderPath, file)
+        const stats = await fs.stat(filePath)
+        if (stats.isDirectory()) {
+          size += await getFolderSize(filePath)
+        } else {
+          size += stats.size
+        }
+      }
+      return (size / (1024)).toFixed(4)
     }
+  } catch (error) {
+    const message = 'Error al comprobar espacio disponible en el servidor (file manager)'
+    return { message, error }
   }
-  return (size / (1024)).toFixed(4)
 }
 
 export const checkStorage = async (req, res) => {

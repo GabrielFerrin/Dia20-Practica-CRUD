@@ -1,6 +1,6 @@
 import pool from '../db/db.js'
 import path from 'path'
-import { checkStorage, checkStorageLocal } from './helpers.js'
+import { checkStorageLocal } from './helpers.js'
 
 export const getUsers = async (req, res) => {
   const { user, pass } = req.query
@@ -16,7 +16,7 @@ export const getUsers = async (req, res) => {
       return res.status(404).json({ message: 'Usuario o contraseña incorrecta' })
     }
     // obtener datos de los usuarios
-    sql = 'SELECT * FROM `' + tableRes[0].table + '`;'
+    sql = 'SELECT * FROM `user' + tableRes[0].table + '`;'
     const [rows] = await pool.execute(sql)
     res.send(rows)
   } catch (error) {
@@ -45,7 +45,7 @@ const checkEmailAvailableLocal = async (user, pass, email) => {
     const message = 'Usuario o contraseña incorrecta'
     return { success: false, message }
   }
-  const sql = 'SELECT * FROM `' + tableRes[0].table + '` WHERE `email` = ?'
+  const sql = 'SELECT * FROM `user' + tableRes[0].table + '` WHERE `email` = ?'
   const [res] = await pool.execute(sql, [email])
   if (res.length > 0) {
     const message = 'El email ya se encuentra registrado'
@@ -86,21 +86,38 @@ export const createUser = async (req, res) => {
       return res.status(400).send({ success: false, message: errorList })
     }
     // add user
-    const sql = 'INSERT INTO `' + table + '` SET ?'
+    const sql = 'INSERT INTO `user' + table + '` SET ?'
     const [rows] = await pool.query(sql, [req.body])
     res.json({ success: true, rows })
   } catch (error) {
     console.log(error)
-    res.status(500).json({ success: false, message: error.message })
+    return res.status(500).json({ success: false, message: error.message })
   }
 }
 
 export const updateUser = async (req, res) => {
+  const { user, pass, id } = req.query
+  if (!pass || !user || !id) {
+    const message = 'Faltan datos'
+    return res.send({ success: false, message })
+  }
   try {
-    const sql = 'UPDATE `user` SET ? WHERE `id` = ?'
-    const [rows] = await pool
-      .query(sql, [req.body, req.params.id])
-    res.send(rows)
+    // obtener nombre de la table del tester
+    let query = 'SELECT * FROM `tester` WHERE `username` = ? AND `password` = ?'
+    const [tableRes] = await pool.execute(query, [user, pass])
+    if (tableRes.length === 0) {
+      const message = 'Usuario o contraseña incorrecta'
+      return res.status(404).json({ success: false, message })
+    }
+    console.log('The body is: ', req.body)
+    const queryParams = Object.keys(req.body).map(key => `${key} = ?`).join(', ')
+    const values = [...Object.values(req.body), id]
+    query = `UPDATE user${tableRes[0].table} SET ${queryParams} WHERE user_id = ?`
+    const [rows] = await pool.query(query, values)
+    if (rows.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no existe' })
+    }
+    res.send({ success: true, message: 'Usuario actualizado' })
   } catch (error) {
     res.status(500).send(error)
   }
@@ -120,7 +137,7 @@ export const deleteUser = async (req, res) => {
       const message = 'Usuario o contraseña incorrecta'
       return res.status(404).json({ success: false, message })
     }
-    sql = 'DELETE FROM `' + tableRes[0].table + '` WHERE `user_id` = ?'
+    sql = 'DELETE FROM `user' + tableRes[0].table + '` WHERE `user_id` = ?'
     const [rows] = await pool.execute(sql, [id])
     if (rows.affectedRows === 0) {
       return res.status(404).json({ message: 'Usuario no existe' })
@@ -145,7 +162,7 @@ export const checkEmailAvailable = async (req, res) => {
       const message = 'Usuario o contraseña incorrecta'
       return res.status(404).json({ success: false, message })
     }
-    const sql = 'SELECT * FROM `' + response[0].table + '` WHERE `email` = ?'
+    const sql = 'SELECT * FROM `user' + response[0].table + '` WHERE `email` = ?'
     const [rows] = await pool.execute(sql, [email])
     if (rows.length > 0) {
       const message = 'El email ya se encuentra registrado'
@@ -170,7 +187,7 @@ export const getPicture = async (req, res) => {
       const message = 'Usuario o contraseña incorrecta'
       return res.status(404).json({ success: false, message })
     }
-    const sql = 'SELECT `picture` FROM `' + tableRes[0].table + '` WHERE `user_id` = ?'
+    const sql = 'SELECT `picture` FROM `user' + tableRes[0].table + '` WHERE `user_id` = ?'
     const [filenameRes] = await pool.execute(sql, [id])
     if (filenameRes.length === 0) {
       return res.status(404).json({ message: 'Usuario no existe' })

@@ -39,7 +39,6 @@ const validateTesterLocal = async (tester, errorList) => {
   if (!tester.username) errorList.push('Falta el nombre de usuario')
   if (!tester.password) errorList.push('Falta la contraseña')
   if (!tester.table) errorList.push('Falta el nombre de la table')
-  else tester.table = 'user' + tester.table
 }
 
 export const validateTesterDB = async (tester, errorList) => {
@@ -71,7 +70,7 @@ export const checkAvailableTester = async (req, res) => {
   try {
     const sql = 'SELECT * FROM `tester`'
     const [rows] = await pool.execute(sql)
-    res.send({ testers: 10 - rows.length })
+    res.send({ testers: 45 - rows.length })
   } catch (error) {
     res.status(500).send(error)
   }
@@ -81,7 +80,7 @@ const checkTestersInDB = async (errorList) => {
   try {
     const sql = 'SELECT * FROM `tester`'
     const [rows] = await pool.execute(sql)
-    if (0 - rows.length > 10) errorList.push('Se sobrepasó la cantidad de testers')
+    if (rows.length > 45) errorList.push('Se sobrepasó la cantidad de testers')
   } catch (error) {
     errorList.push(error)
   }
