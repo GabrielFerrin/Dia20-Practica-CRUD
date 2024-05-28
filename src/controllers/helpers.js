@@ -120,3 +120,25 @@ export const eliminateStorage = async (req, res) => {
     else res.status(500).json(error)
   }
 }
+
+export const dropTalbe = async (table) => {
+  try {
+    const query = 'DROP TABLE IF EXISTS `' + table + '`'
+    const [rows] = await pool.execute(query)
+    console.log(rows)
+    console.log('Se elimino la tabla ' + table)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const emptyTable = async (table) => {
+  try {
+    const query = 'TRUNCATE TABLE `' + table + '`'
+    const [rows] = await pool.execute(query)
+    console.log(rows)
+    console.log('Se vacio la tabla ' + table)
+  } catch (error) {
+    console.log(error)
+  }
+}

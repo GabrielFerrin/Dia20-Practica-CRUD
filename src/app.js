@@ -1,11 +1,13 @@
 import express from 'express'
 import morgan from 'morgan'
 // local imports
-import { checkStorage, cors, corsOptions, eliminateStorage } from './controllers/helpers.js'
+import {
+  checkStorage, cors, corsOptions, eliminateStorage
+  // , emptyTable, dropTalbe
+} from './controllers/helpers.js'
 // routes
 import userRoutes from './routes/user.routes.js'
 import testerRoutes from './routes/testers.routes.js'
-import userSeederRoutes from './routes/user-seeder.routes.js'
 
 // config
 const app = express()
@@ -25,8 +27,6 @@ app.delete('/eliminate-sotrage', eliminateStorage)
 app.use('/testers', testerRoutes)
 // users
 app.use('/users', userRoutes)
-// user seeders
-app.use('/users-seeder', userSeederRoutes)
 // 404
 app.use((req, res) => {
   res.status(404).send({ message: 'Ruta no encontrada' })
@@ -38,3 +38,6 @@ app.use((err, req, res, next) => {
 })
 // export
 export default app
+
+// dropTalbe('userundefined')
+// emptyTable('tester')

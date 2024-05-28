@@ -6,6 +6,10 @@ import {
 import {
   createTesterTable, dropTesterTable, trucateTesterTable
 } from '../controllers/tester-seeder.controller.js'
+import {
+  createUserTables, dropUserTables,
+  seedUsers, trucateUserTable
+} from '../controllers/user-seeder.controller.js'
 
 const router = Router()
 
@@ -18,5 +22,12 @@ router.post('/register', addTester)
 router.post('/create-table', createTesterTable)
 router.delete('/drop-tester-table', dropTesterTable)
 router.delete('/truncate-tester-table', trucateTesterTable)
+
+// seed users
+router.post('/create-user-tables/', createUserTables)
+router.delete('/drop-user-tables', dropUserTables)
+router.delete('/truncate-user-table', trucateUserTable)
+router.post('/seed-users', seedUsers)
+// seed posts
 
 export default router
